@@ -1,0 +1,75 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+double f(double x, double y) {
+	return x*x*log(y);
+}
+
+double N1(double ksi, double eta) {
+	return 0.25*(1.0 - ksi)*(1.0 - eta);
+}
+double N2(double ksi, double eta) {
+	return 0.25*(1.0 + ksi)*(1.0 - eta);
+}
+double N3(double ksi, double eta) {
+	return 0.25*(1.0 + ksi)*(1.0 + eta);
+}
+double N4(double ksi, double eta) {
+	return 0.25*(1.0 - ksi)*(1.0 + eta);
+}
+
+double xT(double x1, double x2, double ksi, double eta) {
+	return x1*N1(ksi, eta) + x2*N2(ksi, eta) + x2*N3(ksi, eta) + x1*N4(ksi, eta);
+}
+double yT(double y1, double y2, double ksi, double eta) {
+	return y1*N1(ksi, eta) + y1*N2(ksi, eta) + y2*N3(ksi, eta) + y2*N4(ksi, eta);
+}
+double gauss(double x1, double y1, double x2, double y2) {
+	double w, wynik, ksi1, ksi2, eta1, eta2, ksi3, ksi4, eta3, eta4;
+	w = 1.0 / sqrt(3);
+	ksi1 = xT(x1, x2, -w, -w);
+	eta1 = yT(y1, y2, -w, -w);
+
+	ksi2 = xT(x1, x2, w, -w);
+	eta2 = yT(y1, y2, w, -w);
+
+	ksi3 = xT(x1, x2, -w, w);
+	eta3 = yT(y1, y2, -w, w);
+
+	ksi4 = xT(x1, x2, w, w);
+	eta4 = yT(y1, y2, w, w);
+
+	wynik = f(ksi1, eta1) + f(ksi2, eta2)+ f(ksi3, eta3) + f(ksi4, eta4);
+	return wynik*0.25*(x2 - x1)*(y2 - y1);
+}
+int main()
+{
+	double x1, x2, y1, y2, hx, hy, blad, calka=0.0;
+	int n = 0;
+	cout << "CALKOWANIE METODA GAUSSA 2D" << endl;
+	cout << "Wprowadz maksymalny blad: ";
+	cin >> blad;
+	do {
+		x1 = 1.0; x2 = 5.0;
+		y1 = exp(1.0); y2 = y1*y1;
+		calka = 0.0;
+		n++;
+		hx = (x2 - x1) / n;
+		hy = (y2 - y1) / n;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				calka += gauss(x1 + i*hx, y1 + j*hy, x1 + (i + 1)*hx, y1 + (j + 1)*hy);
+			}
+		}
+	} while (abs(((124 * exp(1.0)*exp(1.0)) / 3) - calka) > blad);
+	cout << "Otrzymany wynik to: " << setprecision(25) << calka <<endl<<
+			"Wynik scisly: " << ((124 * exp(1.0)*exp(1.0)) / 3)<<endl<<
+			"W celu uzyskania najdokladniejszego wyniku nalezy podzielic obszar na "<<n*n<<" prostokatow." <<endl;
+    return 0;
+}
+
