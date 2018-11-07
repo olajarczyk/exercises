@@ -1,0 +1,48 @@
+#include <iostream>
+#include <cmath>
+#include<math.h>
+#include <stdio.h>
+#include <iomanip>
+
+using namespace std;
+
+double f(double x)
+{
+    return sin(x);
+}
+double xT(double a, double b, double ksi)
+{
+    return (a*((1-ksi)/2)+b*((1+ksi)/2));
+}
+
+double  gauss(double a, double b)
+{
+    double ksi1,ksi2;
+    ksi1=xT(a,b,-(1.0/sqrt(3.0)));
+    ksi2=xT(a,b,(1.0/sqrt(3.0)));
+    return 0.5*(b-a)*(f(ksi1)+f(ksi2));
+}
+int main()
+{
+    int n=0;
+    double a=0.0, b=M_PI/2;
+    double x=0.0, h=0.0;
+    double In, blad;
+    cout<<"Podaj max blad: "<<endl;
+    cin>>blad;
+    do{
+        In=0.0;
+        x=0.0;
+        n++;
+        h=(b-a)/n;
+        for(int i=0;i<n;i++)
+        {
+            In+=gauss(x,x+h);
+            x+=h;
+        }
+        cout<<setprecision(20)<<In<<endl;
+    }
+    while ((1-In)>=blad);
+    cout<<"ilosc przedzialow : "<<n<<endl;
+    return 0;
+}
